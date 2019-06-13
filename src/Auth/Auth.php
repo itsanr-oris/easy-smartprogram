@@ -37,7 +37,7 @@ class Auth extends Component
         $params = [
             'code' => $code,
             'client_id' => $this->app['config']['app_key'],
-            'sk' => $this->app['config']['app_secret'],
+            'sk' => $this->app['config']['secret_key'],
         ];
 
         return $this->http()->post(sprintf('%s?%s', $this->code2SessionEndPoint, http_build_query($params)));

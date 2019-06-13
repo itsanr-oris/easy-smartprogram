@@ -32,6 +32,10 @@ class ServiceProvider implements ServiceProviderInterface
             return new Auth($app);
         };
 
+        !isset($app['swan_id']) && $app['swan_id'] = function ($app) {
+            return new SwanId($app);
+        };
+
         isset($app['http_client']) && $this->registerAccessTokenMiddleware($app);
     }
 

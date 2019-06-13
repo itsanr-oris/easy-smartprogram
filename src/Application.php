@@ -23,6 +23,7 @@ use EasySmartProgram\Support\ServiceContainer;
  * @property \EasySmartProgram\Auth\Auth              $auth
  * @property \EasySmartProgram\Encryptor\Encryptor    $encryptor
  * @property \EasySmartProgram\TemplateMessage\Client $template_message
+ * @property \EasySmartProgram\Auth\SwanId            $swan_id
  */
 class Application extends ServiceContainer
 {

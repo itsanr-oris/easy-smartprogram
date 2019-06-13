@@ -36,7 +36,7 @@ class AccessToken extends Component
         return [
             'grant_type' => 'client_credentials',
             'client_id' => $this->app['config']['app_key'],
-            'client_secret' => $this->app['config']['app_secret'],
+            'client_secret' => $this->app['config']['secret_key'],
             'scope' => 'smartapp_snsapi_base',
         ];
     }
