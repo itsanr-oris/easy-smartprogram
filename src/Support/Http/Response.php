@@ -94,7 +94,7 @@ class Response extends \GuzzleHttp\Psr7\Response implements \ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        throw new RuntimeException('Unavailable!');
+        throw new RuntimeException('Not allow to set key-value pairs!');
     }
 
     /**
@@ -103,7 +103,7 @@ class Response extends \GuzzleHttp\Psr7\Response implements \ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        throw new RuntimeException('Unavailable!');
+        throw new RuntimeException('Not allow to unset an exists key-value pairs!');
     }
 
 

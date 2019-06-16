@@ -92,6 +92,9 @@ class HttpClient
     public function removeMiddleware(string $name)
     {
         unset($this->middleware[$name]);
+        if ($this->handlerStack instanceof HandlerStack) {
+            $this->handlerStack->remove($name);
+        }
         return $this;
     }
 
@@ -128,14 +131,32 @@ class HttpClient
     }
 
     /**
+     * @param ClientInterface $client
+     * @return $this
+     */
+    public function setGuzzleClient(ClientInterface $client)
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    /**
      * @return Client|ClientInterface
      */
-    protected function client()
+    public function getGuzzleClient()
     {
         if (!($this->client instanceof ClientInterface)) {
             $this->client = new Client($this->config);
         }
         return $this->client;
+    }
+
+    /**
+     * @return Client|ClientInterface
+     */
+    public function client()
+    {
+        return $this->getGuzzleClient();
     }
 
     /**

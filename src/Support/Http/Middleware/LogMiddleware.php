@@ -11,6 +11,7 @@ namespace EasySmartProgram\Support\Http\Middleware;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Class LogMiddleware
@@ -58,6 +59,14 @@ class LogMiddleware implements MiddlewareInterface
     }
 
     /**
+     * @return mixed|string
+     */
+    protected function level()
+    {
+        return $this->config['log_level'] ?? LogLevel::INFO;
+    }
+
+    /**
      * @return string
      */
     public function name() : string
@@ -70,6 +79,6 @@ class LogMiddleware implements MiddlewareInterface
      */
     public function callable() : callable
     {
-        return Middleware::log($this->logger(), new MessageFormatter($this->format()));
+        return Middleware::log($this->logger(), new MessageFormatter($this->format()), $this->level());
     }
 }

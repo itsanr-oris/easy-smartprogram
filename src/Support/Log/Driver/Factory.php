@@ -104,11 +104,11 @@ class Factory
     public function alias(string $name, string $alias)
     {
         if (!isset($this->creators[$name])) {
-            throw new RuntimeException(sprintf('Creator [%s] not exists!', $name));
+            throw new RuntimeException(sprintf('Driver creator [%s] not exists!', $name));
         }
 
-        if (isset($this->aliases[$alias])) {
-            throw new RuntimeException(sprintf('Creator alias [%s] already exists!', $alias));
+        if (isset($this->aliases[$alias]) || isset($this->creators[$alias])) {
+            throw new RuntimeException(sprintf('Driver creator [%s] already exists!', $alias));
         }
 
         $this->aliases[$alias] = $name;
@@ -197,7 +197,7 @@ class Factory
                 );
             }
 
-            return new Monolog($channel, $config['handlers']);
+            return new Monolog($channel, $handlers);
         };
     }
 }

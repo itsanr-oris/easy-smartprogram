@@ -10,6 +10,7 @@ namespace EasySmartProgram\Support\Http\Middleware;
 
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -69,7 +70,8 @@ class RetryMiddleware implements MiddlewareInterface
                 return false;
             }
 
-            if ($exception instanceof ConnectException) {
+            if ($exception instanceof ConnectException
+                || $exception instanceof ServerException) {
                 return true;
             }
 
