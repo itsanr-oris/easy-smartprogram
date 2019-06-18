@@ -82,6 +82,9 @@ class HttpClient
     public function pushMiddleware(MiddlewareInterface $middleware)
     {
         $this->middleware[$middleware->name()] = $middleware->callable();
+        if ($this->handlerStack instanceof HandlerStack) {
+            $this->handlerStack->push($middleware->callable(), $middleware->name());
+        }
         return $this;
     }
 
@@ -162,35 +165,48 @@ class HttpClient
     /**
      * @param string $url
      * @param array  $query
+     * @param array  $options
      * @return ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function get(string $url, array $query = [])
-    {
-        return $this->request($url,'GET', ['query' => $query]);
+    public function get(
+        string $url,
+        array $query = [],
+        array $options = []
+    ) {
+        return $this->request($url,'GET', array_merge($options, ['query' => $query]));
     }
 
     /**
      * @param string $url
      * @param array  $data
+     * @param array  $options
      * @return ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function post(string $url, array $data = [])
-    {
-        return $this->request($url, 'POST', ['form_params' => $data]);
+    public function post(
+        string $url,
+        array $data = [],
+        array $options = []
+    ) {
+        return $this->request($url, 'POST', array_merge($options, ['form_params' => $data]));
     }
 
     /**
      * @param string $url
      * @param array  $data
      * @param array  $query
+     * @param array  $options
      * @return ResponseInterface|string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function postJson(string $url, array $data = [], array $query = [])
-    {
-        return $this->request($url, 'POST', ['query' => $query, 'json' => $data]);
+    public function postJson(
+        string $url,
+        array $data = [],
+        array $query = [],
+        array $options = []
+    ) {
+        return $this->request($url, 'POST', array_merge($options, ['query' => $query, 'json' => $data]));
     }
 
     /**
@@ -198,11 +214,17 @@ class HttpClient
      * @param array  $files
      * @param array  $form
      * @param array  $query
+     * @param array  $options
      * @return ResponseInterface|string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function upload(string $url, array $files = [], array $form = [], array $query = [])
-    {
+    public function upload(
+        string $url,
+        array $files = [],
+        array $form = [],
+        array $query = [],
+        array $options = []
+    ) {
         $multipart = [];
 
         foreach ($files as $name => $path) {
@@ -216,9 +238,9 @@ class HttpClient
             $multipart[] = compact('name', 'contents');
         }
 
-        return $this->request($url, 'POST', [
+        return $this->request($url, 'POST', array_merge($options, [
             'query' => $query, 'multipart' => $multipart, 'connect_timeout' => 30, 'timeout' => 30, 'read_timeout' => 30
-        ]);
+        ]));
     }
 
     /**

@@ -25,7 +25,7 @@ class ServiceProvider implements ServiceProviderInterface
     public function register(Container $app)
     {
         !isset($app['template_message']) && $app['template_message'] = function ($app) {
-            return new Client($app);
+            return new Manager($app);
         };
     }
 }

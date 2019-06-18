@@ -17,7 +17,7 @@ use EasySmartProgram\Support\Exception\InvalidArgumentException;
  * @author  f-oris <us@f-oris.me>
  * @version 1.0.0
  */
-class Client extends Component
+class Manager extends Component
 {
     /**
      * 场景定义

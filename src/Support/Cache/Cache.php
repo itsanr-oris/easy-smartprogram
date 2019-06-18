@@ -86,7 +86,7 @@ class Cache
      * @return \Symfony\Component\Cache\Adapter\AbstractAdapter
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
-    protected function getAdapter()
+    public function getAdapter()
     {
         if ($this->adapter === null) {
             $adapter = $this->config['default'] ?? 'file';

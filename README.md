@@ -19,6 +19,3 @@
 composer require f-oris/easy-smartprogram:dev-master
 
 参考[easy-wechat](https://github.com/overtrue/wechat)，因为是仿着做的，所以小程序各组件提供的方法，含义，用法基本上和easy-wechat一致，底层有点不一样，需要深入定制扩展的要看一下源码
-
-## 备注
-&emsp;&emsp;尚未完成测试，仅简单调用了一下接口，基本上是逻辑是通的

@@ -50,22 +50,22 @@ class AccessToken extends Component
     }
 
     /**
+     * @param bool $reflesh
      * @return array|null
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function accessTokenRequest()
+    public function accessTokenRequest($reflesh = false)
     {
         $key = $this->getCacheKey();
-        if ($this->cache()->has($key)) {
+        if (!$reflesh && $this->cache()->has($key)) {
             return $this->cache()->get($key);
         }
 
-        $response = $this->http()->request(
+        $response = $this->http()->withoutAccessToken()->request(
             $this->endpointToGetToken,
             'POST',
-            ['base_uri' => '', 'form_params' => $this->getCredentials(), 'without_token' => true]
+            ['base_uri' => '', 'form_params' => $this->getCredentials()]
         )->toArray();
 
         $this->cache()->set($key, $response);
@@ -74,13 +74,14 @@ class AccessToken extends Component
     }
 
     /**
+     * @param bool $reflesh
+     * @return mixed|null
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getAccessToken()
+    public function getAccessToken($reflesh = false)
     {
-        $response = $this->accessTokenRequest();
+        $response = $this->accessTokenRequest($reflesh);
         return $response['access_token'] ?? null;
     }
 
@@ -88,7 +89,6 @@ class AccessToken extends Component
      * @return array
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getQuery()
     {

@@ -13,6 +13,8 @@ use EasySmartProgram\Support\Exception\RuntimeException;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 /**
  * Class Factory
@@ -47,16 +49,18 @@ class Factory
     protected function registerDefaultCreator()
     {
         $this->extend($this->filesystemCacheAdapterCreator(), 'filesystem', 'file');
+        $this->extend($this->memcachedCacheAdapterCreator(), 'memcached', 'memcache');
+        $this->extend($this->redisCacheAdapterCreator(), 'redis', 'redis');
         $this->extend($this->chainCacheAdapterCreator(), 'chain', 'stack');
     }
 
     /**
      * @param string $name
      * @param array  $config
-     * @return AbstractAdapter
+     * @return AbstractAdapter|mixed
      * @throws RuntimeException
      */
-    public function make(string $name, array $config = []) : AbstractAdapter
+    public function make(string $name, array $config = [])
     {
         $creator = $this->aliases[$name] ?? $name;
 
@@ -64,7 +68,7 @@ class Factory
             return $this->creators[$creator]($config);
         }
 
-        throw new RuntimeException('Can not create cache driver [%s]!');
+        throw new RuntimeException(sprintf('Can not create cache driver [%s]!', $name));
     }
 
     /**
@@ -112,10 +116,36 @@ class Factory
     protected function filesystemCacheAdapterCreator()
     {
         return function (array $config = []) {
-            $namespace = $config['namespace'] ?? '';
-            $lifetime = $config['ttl'] ?? 0;
-            $directory = $config['path'] ?? null;
-            return new FilesystemAdapter($namespace, $lifetime, $directory);
+            return new FilesystemAdapter(
+                $config['namespace'] ?? '',
+                $config['life_time'] ?? 0,
+                $config['path'] ?? sys_get_temp_dir() . '/easy-cache/'
+            );
+        };
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function redisCacheAdapterCreator()
+    {
+        return function (array $config = []) {
+            return new RedisAdapter(
+                RedisAdapter::createConnection($config['dsn'], $config['options'] ?? []),
+                $config['name_space'] ?? '',
+                $config['life_time'] ?? 0
+            );
+        };
+    }
+
+    public function memcachedCacheAdapterCreator()
+    {
+        return function (array $config = []) {
+            return new MemcachedAdapter(
+                MemcachedAdapter::createConnection($config['dsn'], $config['options'] ?? []),
+                $config['name_space'] ?? '',
+                $config['life_time'] ?? 0
+            );
         };
     }
 
@@ -126,8 +156,8 @@ class Factory
     {
         return function (array $config = []) {
             $adapters = [];
-            foreach ($config['adapters'] as $adapter) {
-                $adapters[] = $this->make($adapter, $config[$adapter] ?? []);
+            foreach ($config['drivers'] as $adapter) {
+                $adapters[] = $this->make($adapter, $config['total_drivers'][$adapter] ?? []);
             }
 
             if (empty($adapters)) {

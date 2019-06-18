@@ -38,13 +38,13 @@ return [
             'dev' => [
                 'name' => 'dev',
                 'driver' => 'single',
-                'path' => sys_get_temp_dir() . '/logs/smart-program.log',
+                'path' => __DIR__ . '/logs/smart-program.log',
                 'level' => 'debug',
             ],
             'prod' => [
                 'name' => 'prod',
                 'driver' => 'daily',
-                'path' => sys_get_temp_dir() . '/logs/smart-program.log',
+                'path' => __DIR__ . '/logs/smart-program.log',
                 'level' => 'info',
             ],
         ],
@@ -64,8 +64,33 @@ return [
          */
         'drivers' => [
             'file' => [
-                'path' => sys_get_temp_dir() . '/cache/',
+                'path' => __DIR__ . '/cache/',
             ],
         ]
     ],
+
+    /**
+     * http client config
+     */
+    'http_client' => [
+        /**
+         * request log template
+         */
+        'log_template' => \GuzzleHttp\MessageFormatter::DEBUG,
+
+        /**
+         * log level
+         */
+        'log_level' => \Psr\Log\LogLevel::DEBUG,
+
+        /**
+         * max retry times
+         */
+        'max_retries' => 1,
+
+        /**
+         * retry delay time, default 500ms
+         */
+        'retry_delay' => 500,
+    ]
 ];

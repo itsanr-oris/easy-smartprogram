@@ -19,11 +19,9 @@ use EasySmartProgram\Support\Component;
 class Auth extends Component
 {
     /**
-     * 小程序登录接口
-     *
      * @var string
      */
-    protected $code2SessionEndPoint = 'https://spapi.baidu.com/oauth/jscode2sessionkey';
+    protected $endPoint = 'https://spapi.baidu.com/oauth/jscode2sessionkey';
 
     /**
      * 认证
@@ -40,6 +38,6 @@ class Auth extends Component
             'sk' => $this->app['config']['secret_key'],
         ];
 
-        return $this->http()->post(sprintf('%s?%s', $this->code2SessionEndPoint, http_build_query($params)));
+        return $this->http()->withoutAccessToken()->post(sprintf('%s?%s', $this->endPoint, http_build_query($params)));
     }
 }

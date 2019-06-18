@@ -205,12 +205,12 @@ class HttpClientTest extends TestCase
         $middleware->shouldReceive('callable')->andReturn($callable);
 
         $httpClient = new HttpClient();
-        $httpClient->pushMiddleware($middleware);
         $handlerStack = $httpClient->getHandlerStack();
-
         $expectHandlerStack = HandlerStack::create();
         $expectHandlerStack->push($callable, 'test-middleware');
+        $this->assertNotEquals($expectHandlerStack, $handlerStack);
 
+        $httpClient->pushMiddleware($middleware);
         $this->assertEquals($expectHandlerStack, $handlerStack);
 
         return $httpClient;
