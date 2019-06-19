@@ -38,7 +38,6 @@ class AuthTest extends TestCase
 
         $response = $this->app()->auth->session('test_session_code');
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertNotEmpty($this->historyRequest());
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];

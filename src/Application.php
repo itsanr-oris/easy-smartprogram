@@ -28,6 +28,8 @@ use EasySmartProgram\Http\ServiceProvider as HttpServiceProvider;
  * @property \EasySmartProgram\Encryptor\Encryptor     $encryptor
  * @property \EasySmartProgram\TemplateMessage\Manager $template_message
  * @property \EasySmartProgram\Auth\SwanId             $swan_id
+ * @property \EasySmartProgram\Resource\Resource       $resource
+ * @property \EasySmartProgram\Resource\SiteMap        $site_map
  */
 class Application extends ServiceContainer
 {
@@ -51,6 +53,7 @@ class Application extends ServiceContainer
         \EasySmartProgram\Encryptor\ServiceProvider::class,
         \EasySmartProgram\Auth\ServiceProvider::class,
         \EasySmartProgram\TemplateMessage\ServiceProvider::class,
+        \EasySmartProgram\Resource\ServiceProvider::class,
     ];
 
     /**
