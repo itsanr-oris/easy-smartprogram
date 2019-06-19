@@ -60,6 +60,11 @@ return [
         'default' => 'file',
 
         /**
+         * cache life time
+         */
+        'life_time' => 1800,
+
+        /**
          * available cache drivers
          */
         'drivers' => [

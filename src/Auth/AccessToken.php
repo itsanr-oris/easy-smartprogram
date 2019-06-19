@@ -50,15 +50,15 @@ class AccessToken extends Component
     }
 
     /**
-     * @param bool $reflesh
+     * @param bool $refresh
      * @return array|null
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
-    public function accessTokenRequest($reflesh = false)
+    public function accessTokenRequest($refresh = false)
     {
         $key = $this->getCacheKey();
-        if (!$reflesh && $this->cache()->has($key)) {
+        if (!$refresh && $this->cache()->has($key)) {
             return $this->cache()->get($key);
         }
 
@@ -74,14 +74,14 @@ class AccessToken extends Component
     }
 
     /**
-     * @param bool $reflesh
+     * @param bool $refresh
      * @return mixed|null
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
-    public function getAccessToken($reflesh = false)
+    public function getAccessToken($refresh = false)
     {
-        $response = $this->accessTokenRequest($reflesh);
+        $response = $this->accessTokenRequest($refresh);
         return $response['access_token'] ?? null;
     }
 

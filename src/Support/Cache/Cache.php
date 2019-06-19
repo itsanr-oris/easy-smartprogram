@@ -91,6 +91,7 @@ class Cache
         if ($this->adapter === null) {
             $adapter = $this->config['default'] ?? 'file';
             $config = $this->config['drivers'][$adapter] ?? [];
+            $config['life_time'] = $this->config['life_time'] ?? 3600;
             $this->adapter = $this->getAdapterFactory()->make($adapter, $config);
         }
 

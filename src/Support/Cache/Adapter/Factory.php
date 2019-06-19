@@ -157,7 +157,9 @@ class Factory
         return function (array $config = []) {
             $adapters = [];
             foreach ($config['drivers'] as $adapter) {
-                $adapters[] = $this->make($adapter, $config['total_drivers'][$adapter] ?? []);
+                $driverConfig = $config['total_drivers'][$adapter] ?? [];
+                $driverConfig['life_time'] = $config['life_time'] ?? 3600;
+                $adapters[] = $this->make($adapter, $driverConfig);
             }
 
             if (empty($adapters)) {

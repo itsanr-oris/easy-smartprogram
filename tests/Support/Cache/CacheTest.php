@@ -31,7 +31,7 @@ class CacheTest extends TestCase
         $factory = Mockery::mock(Factory::class);
 
         $filesystemAdapter = Mockery::mock(FilesystemAdapter::class);
-        $factory->shouldReceive('make')->withArgs(['file', []])->andReturn($filesystemAdapter);
+        $factory->shouldReceive('make')->withArgs(['file', ['life_time' => 3600]])->andReturn($filesystemAdapter);
 
         $cache = new Cache($factory, []);
         $this->assertInstanceOf(FilesystemAdapter::class, $cache->getAdapter());
@@ -45,15 +45,16 @@ class CacheTest extends TestCase
         $factory = Mockery::mock(Factory::class);
 
         $filesystemAdapter = Mockery::mock(FilesystemAdapter::class);
-        $factory->shouldReceive('make')->withArgs(['file', []])->andReturn($filesystemAdapter);
+        $factory->shouldReceive('make')->withArgs(['file', ['life_time' => 3600]])->andReturn($filesystemAdapter);
 
         $memcachedAdapter = Mockery::mock(MemcachedAdapter::class);
         $factory->shouldReceive('make')->withArgs(
             [
                 'memcached',
                 [
-                    'dsn' => ['memcached://localhost:11211']
-                ]
+                    'dsn' => ['memcached://localhost:11211'],
+                    'life_time' => 3600
+                ],
             ]
         )->andReturn($memcachedAdapter);
 
