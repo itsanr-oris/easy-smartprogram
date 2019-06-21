@@ -8,7 +8,9 @@
 
 namespace EasySmartProgram\Support\Cache;
 
-use EasySmartProgram\Support\Cache\Adapter\Factory as AdapterFactory;
+use EasySmartProgram\Support\Cache\Adapter\Factory;
+use EasySmartProgram\Support\Exception\InvalidConfigException;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Class CacheManager
@@ -19,132 +21,210 @@ use EasySmartProgram\Support\Cache\Adapter\Factory as AdapterFactory;
 class Cache
 {
     /**
+     * @var Factory
+     */
+    protected $factory;
+
+    /**
      * @var array
      */
     protected $config = [];
 
     /**
-     * @var AdapterFactory
+     * @var CacheItemPoolInterface
      */
-    protected $adapterFactory;
+    protected $driver;
 
     /**
-     * @var
-     */
-    protected $adapter;
-
-    /**
-     * CacheManager constructor.
-     * @param AdapterFactory $factory
-     * @param array          $config
-     */
-    public function __construct(AdapterFactory $factory, array $config = [])
-    {
-        $this->config = $config;
-        $this->setAdapterFactory($factory);
-    }
-
-    /**
-     * @param AdapterFactory $factory
-     * @return Cache
-     */
-    public function setAdapterFactory(AdapterFactory $factory)
-    {
-        $this->adapterFactory = $factory;
-        return $this;
-    }
-
-    /**
-     * @return AdapterFactory
-     */
-    public function getAdapterFactory() : AdapterFactory
-    {
-        return $this->adapterFactory;
-    }
-
-    /**
-     * @param $adapter
-     * @return Cache
-     */
-    public function adapter(string $adapter)
-    {
-        return $this->setAdapter($adapter);
-    }
-
-    /**
-     * @param $adapter
-     * @return Cache
-     */
-    public function setAdapter(string $adapter)
-    {
-        $this->config['default'] = $adapter;
-        $this->adapter = null;
-        return $this;
-    }
-
-    /**
-     * @return \Symfony\Component\Cache\Adapter\AbstractAdapter
+     * Cache constructor.
+     * @param Factory $factory
+     * @param array   $config
+     * @throws InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
-    public function getAdapter()
+    public function __construct(Factory $factory, array $config = [])
     {
-        if ($this->adapter === null) {
-            $adapter = $this->config['default'] ?? 'file';
-            $config = $this->config['drivers'][$adapter] ?? [];
-            $config['life_time'] = $this->config['life_time'] ?? 3600;
-            $this->adapter = $this->getAdapterFactory()->make($adapter, $config);
+        $this->factory = $factory;
+        $this->config = $config;
+
+        $this->driver($this->config['default']);
+    }
+
+    /**
+     * @param string|null $driver
+     * @return $this
+     * @throws InvalidConfigException
+     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     */
+    public function driver(string $driver = null)
+    {
+        if ($driver && !isset($this->config['drivers'][$driver])) {
+            throw new InvalidConfigException('No cache driver configuration was found!');
         }
 
-        return $this->adapter;
+        $driver = $driver ?? $this->config['default'];
+        $this->driver = $this->factory->make($driver, $this->getConfig($driver));
+        return $this;
     }
 
     /**
-     * @param $id
-     * @param $value
-     * @return Cache
-     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @return CacheItemPoolInterface
      */
-    public function set($id, $value)
+    public function getDriver()
     {
-        $adapter = $this->getAdapter();
+        return $this->driver;
+    }
 
-        $item = $adapter->getItem($id)->set($value);
-        $adapter->save($item);
+    /**
+     * @param string|null $driver
+     * @return array
+     * @throws InvalidConfigException
+     */
+    public function getConfig(string $driver = null)
+    {
+        if ($driver && !isset($this->config['drivers'][$driver])) {
+            throw new InvalidConfigException('No cache driver configuration was found!');
+        }
+
+        if ($driver === null) {
+            return $this->config;
+        }
+
+        $commonConfig = $this->config;
+        unset($commonConfig['drivers']);
+        return array_merge($this->config['drivers'][$driver], $commonConfig);
+    }
+
+    /**
+     * @param      $key
+     * @param      $value
+     * @param null $ttl
+     * @return $this
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function put($key, $value, $ttl = null)
+    {
+        $ttl = $ttl ?? $this->config['life_time'];
+        $item = $this->driver->getItem($key)->set($value)->expiresAfter($ttl);
+        $this->driver->save($item);
+        return $this;
+    }
+
+    /**
+     * @param      $values
+     * @param null $ttl
+     * @return $this
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function putMany($values, $ttl = null)
+    {
+        foreach ($values as $key => $value) {
+            $this->put($key, $value, $ttl);
+        }
 
         return $this;
     }
 
     /**
-     * @param $id
-     * @return null
-     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @param      $key
+     * @param      $value
+     * @param null $ttl
+     * @return Cache
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function get($id)
+    public function set($key, $value, $ttl = null)
     {
-        $adapter = $this->getAdapter();
+        return $this->put($key, $value, $ttl);
+    }
 
-        $item = $adapter->getItem($id);
+    /**
+     * @param $key
+     * @return mixed|null
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function get($key)
+    {
+        $item = $this->driver->getItem($key);
         return $item->isHit() ? $item->get() : null;
     }
 
     /**
-     * @param $id
-     * @return Cache
-     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @param          $key
+     * @param          $ttl
+     * @param \Closure $callback
+     * @return mixed
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function delete($id)
+    public function remember($key, $ttl, \Closure $callback)
     {
-        $this->getAdapter()->deleteItem($id);
-        return $this;
+        $value = $this->get($key);
+
+        if (!is_null($value)) {
+            return $value;
+        }
+
+        $this->put($key, $value = $callback(), $ttl);
+
+        return $value;
     }
 
     /**
-     * @param $id
-     * @return mixed
-     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @param $key
+     * @return bool
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function has($id)
+    public function forget($key)
     {
-        return $this->getAdapter()->getItem($id)->isHit();
+        return $this->driver->deleteItem($key);
+    }
+
+    /**
+     * @param $key
+     * @return bool
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function delete($key)
+    {
+        return $this->forget($key);
+    }
+
+    /**
+     * @param array $keys
+     * @return bool
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function deleteMany(array $keys)
+    {
+        foreach ($keys as $key) {
+            $this->delete($key);
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function flush()
+    {
+        return $this->driver->clear();
+    }
+
+    /**
+     * @return bool
+     */
+    public function clear()
+    {
+        return $this->flush();
+    }
+
+    /**
+     * @param $key
+     * @return bool
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function has($key)
+    {
+        return $this->driver->getItem($key)->isHit();
     }
 }

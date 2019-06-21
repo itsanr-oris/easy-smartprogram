@@ -54,6 +54,7 @@ class AccessToken extends Component
      * @return array|null
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function accessTokenRequest($refresh = false)
     {
@@ -78,6 +79,7 @@ class AccessToken extends Component
      * @return mixed|null
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getAccessToken($refresh = false)
     {
@@ -89,6 +91,7 @@ class AccessToken extends Component
      * @return array
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getQuery()
     {

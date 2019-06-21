@@ -23,6 +23,7 @@ trait HasCache
     /**
      * @return Cache|mixed
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
+     * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
     public function cache()
     {
@@ -33,6 +34,14 @@ trait HasCache
             }
         }
 
-        return new Cache(new Factory());
+        return new Cache(
+            new Factory(),
+            [
+                'default' => 'file',
+                'drivers' => [
+                    'file' => ['path' => sys_get_temp_dir() . '/cache/']
+                ]
+            ]
+        );
     }
 }

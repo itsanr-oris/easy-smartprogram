@@ -21,7 +21,7 @@ class AccessTokenTest extends TestCase
     /**
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function testGetAccessToken()
     {
@@ -47,6 +47,7 @@ class AccessTokenTest extends TestCase
     /**
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function testFormatAccessTokenToQueryParam()
     {

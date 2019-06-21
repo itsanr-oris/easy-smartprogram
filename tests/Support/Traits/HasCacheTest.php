@@ -25,6 +25,7 @@ class HasCacheTest extends TestCase
 {
     /**
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
+     * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
     public function testGetCache()
     {
@@ -34,6 +35,7 @@ class HasCacheTest extends TestCase
 
     /**
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
+     * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
     public function testGetCacheFromServiceContainer()
     {

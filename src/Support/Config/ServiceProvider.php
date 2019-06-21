@@ -8,8 +8,8 @@
 
 namespace EasySmartProgram\Support\Config;
 
+use EasySmartProgram\Support\Collection\Collection;
 use EasySmartProgram\Support\ServiceContainer;
-use Illuminate\Support\Collection;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 

@@ -65,6 +65,7 @@ class HttpClient extends \EasySmartProgram\Support\Http\HttpClient
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function request(string $url, $method = 'GET', $options = []): Response
     {

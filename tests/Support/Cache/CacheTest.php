@@ -10,8 +10,11 @@ namespace EasySmartProgram\Tests\Support\Cache;
 
 use EasySmartProgram\Support\Cache\Adapter\Factory;
 use EasySmartProgram\Support\Cache\Cache;
+use EasySmartProgram\Support\Exception\InvalidConfigException;
 use EasySmartProgram\Tests\TestCase;
 use Mockery;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 
@@ -24,123 +27,211 @@ use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 class CacheTest extends TestCase
 {
     /**
-     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @return Mockery\MockInterface|FilesystemAdapter
      */
-    public function testGetDefaultCacheDriver()
+    protected function mockFilesystemCacheAdapter()
     {
-        $factory = Mockery::mock(Factory::class);
+        $adapter = Mockery::mock(FilesystemAdapter::class);
 
-        $filesystemAdapter = Mockery::mock(FilesystemAdapter::class);
-        $factory->shouldReceive('make')->withArgs(['file', ['life_time' => 3600]])->andReturn($filesystemAdapter);
+        $hitCache = Mockery::mock(CacheItemInterface::class);
+        $hitCache->shouldReceive('isHit')->andReturnTrue();
+        $hitCache->shouldReceive('set')->andReturn($hitCache);
+        $hitCache->shouldReceive('expiresAfter')->andReturn($hitCache);
+        $hitCache->shouldReceive('get')->andReturn('hit_cache');
+        $adapter->shouldReceive('getItem')->withArgs(['hit_cache'])->andReturn($hitCache);
 
-        $cache = new Cache($factory, []);
-        $this->assertInstanceOf(FilesystemAdapter::class, $cache->getAdapter());
+        $notHitCache = Mockery::mock(CacheItemInterface::class);
+        $notHitCache->shouldReceive('isHit')->andReturnFalse();
+        $notHitCache->shouldReceive('set')->andReturn($hitCache);
+        $notHitCache->shouldReceive('expiresAfter')->andReturn($hitCache);
+        $notHitCache->shouldReceive('get')->andReturnNull();
+        $adapter->shouldReceive('getItem')->withArgs(['not_hit_cache'])->andReturn($notHitCache);
+
+        $adapter->shouldReceive('save')->andReturnTrue();
+        $adapter->shouldReceive('deleteItem')->andReturnTrue();
+        $adapter->shouldReceive('clear')->andReturnTrue();
+
+        return $adapter;
     }
 
     /**
+     * @return Mockery\MockInterface|MemcachedAdapter
+     */
+    protected function mockMemcachedCacheAdapter()
+    {
+        return Mockery::mock(MemcachedAdapter::class);
+    }
+
+    /**
+     * @return Cache
+     * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
-    public function testConfigDefaultCacheDriver()
+    protected function cache()
     {
-        $factory = Mockery::mock(Factory::class);
+        $config = [
+            'default' => 'file',
 
-        $filesystemAdapter = Mockery::mock(FilesystemAdapter::class);
-        $factory->shouldReceive('make')->withArgs(['file', ['life_time' => 3600]])->andReturn($filesystemAdapter);
+            'life_time' => 3600,
 
-        $memcachedAdapter = Mockery::mock(MemcachedAdapter::class);
-        $factory->shouldReceive('make')->withArgs(
-            [
-                'memcached',
-                [
-                    'dsn' => ['memcached://localhost:11211'],
-                    'life_time' => 3600
-                ],
-            ]
-        )->andReturn($memcachedAdapter);
-
-        $cache = new Cache($factory, [
-            'default' => 'memcached',
             'drivers' => [
-                'file' => [],
+                'file' => [
+                    'path' => sys_get_temp_dir() . '/cache/'
+                ],
+
                 'memcached' => [
-                    'dsn' => ['memcached://localhost:11211']
-                ]
+                    'dsn' => ['memcached://localhost:11211'],
+                ],
             ],
-        ]);
+        ];
 
-        $this->assertInstanceOf(MemcachedAdapter::class, $cache->getAdapter());
+        $factory = Mockery::mock(Factory::class);
 
-        return $cache;
-    }
+        $factory->shouldReceive('make')->withArgs(
+            function ($driver) {
+                return $driver == 'file';
+            }
+        )->andReturn($this->mockFilesystemCacheAdapter());
 
-    /**
-     * @depends testConfigDefaultCacheDriver
-     * @param Cache $cache
-     * @throws \EasySmartProgram\Support\Exception\RuntimeException
-     */
-    public function testSpecificCacheDriver(Cache $cache)
-    {
-        $this->assertInstanceOf(FilesystemAdapter::class, $cache->adapter('file')->getAdapter());
+        $factory->shouldReceive('make')->withArgs(
+            function ($driver) {
+                return $driver == 'memcached';
+            }
+        )->andReturn($this->mockMemcachedCacheAdapter());
+
+        return new Cache($factory, $config);
     }
 
     /**
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
-    public function testSetCacheData()
+    public function testGetDefaultCacheDriver()
     {
-        $cache = new Cache(new Factory(), [
-            'default' => 'file',
-            'drivers' => [
-                'file' => ['path' => sys_get_temp_dir() . '/cache/'],
-            ]
-        ]);
-        $this->assertSame($cache, $cache->set('test_cache_id', 'cache_value'));
-        $this->assertTrue($cache->getAdapter()->getItem('test_cache_id')->isHit());
+        $this->assertInstanceOf(CacheItemPoolInterface::class, $this->cache()->getDriver());
+    }
 
+    /**
+     * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
+     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     */
+    public function testSpecificCacheDriver()
+    {
+        $this->assertInstanceOf(MemcachedAdapter::class, $this->cache()->driver('memcached')->getDriver());
+
+        $this->expectException(InvalidConfigException::class);
+        $this->expectExceptionMessage('No cache driver configuration was found!');
+        $this->cache()->driver('not_exists_driver');
+    }
+
+    /**
+     * @throws InvalidConfigException
+     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     */
+    public function testGetDriverConfig()
+    {
+        $this->assertSame(
+            [
+                'default' => 'file',
+
+                'life_time' => 3600,
+
+                'drivers' => [
+                    'file' => [
+                        'path' => sys_get_temp_dir() . '/cache/'
+                    ],
+
+                    'memcached' => [
+                        'dsn' => ['memcached://localhost:11211'],
+                    ],
+                ],
+            ],
+            $this->cache()->getConfig()
+        );
+
+        $this->assertSame(
+            [
+                'path' => sys_get_temp_dir() . '/cache/',
+                'default' => 'file',
+                'life_time' => 3600,
+            ],
+            $this->cache()->getConfig('file')
+        );
+
+        $this->expectException(InvalidConfigException::class);
+        $this->expectExceptionMessage('No cache driver configuration was found!');
+        $this->cache()->getConfig('not_exists_driver');
+    }
+
+    /**
+     * @return Cache
+     * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
+     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function testPutCacheData()
+    {
+        $cache = $this->cache();
+        $this->assertSame($cache, $cache->set('hit_cache', 'hit_cache'));
+        $this->assertSame($cache, $cache->putMany(['hit_cache' => 'hit_cache']));
         return $cache;
     }
 
     /**
-     * @param Cache $cache
-     * @depends testSetCacheData
+     * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function testGetCacheData(Cache $cache)
+    public function testGetCacheData()
     {
-        $this->assertSame('cache_value', $cache->get('test_cache_id'));
-        $this->assertNull($cache->get('not_exists_cache_key'));
+        $cache = $this->cache();
+        $this->assertSame('hit_cache', $cache->get('hit_cache'));
+        $this->assertNull($cache->get('not_hit_cache'));
     }
 
     /**
-     * @param Cache $cache
-     * @depends testSetCacheData
+     * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function testHasCacheData(Cache $cache)
+    public function testHasCacheData()
     {
-        $this->assertTrue($cache->has('test_cache_id'));
+        $this->assertTrue($this->cache()->has('hit_cache'));
     }
 
     /**
-     * @param Cache $cache
-     * @depends testSetCacheData
+     * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function testDeleteCacheData(Cache $cache)
+    public function testDeleteCacheData()
     {
-        $this->assertSame($cache, $cache->delete('test_cache_id'));
-        $this->assertFalse($cache->getAdapter()->getItem('test_cache_id')->isHit());
+        $this->assertTrue($this->cache()->delete('hit_cache'));
+        $this->assertTrue($this->cache()->deleteMany(['hit_cache']));
     }
 
     /**
-     * @param Cache $cache
-     * @depends testSetCacheData
+     * @throws InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      */
-    public function testSetDuplicateCacheId(Cache $cache)
+    public function testClearCache()
     {
-        $cache->set('test_cache_id', 'cache_value_2');
-        $this->assertSame('cache_value_2', $cache->get('test_cache_id'));
+        $this->assertTrue($this->cache()->clear());
+    }
+
+    /**
+     * @throws InvalidConfigException
+     * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function testRememberCache()
+    {
+        $this->assertSame('remember', $this->cache()->remember('not_hit_cache', 1800, function (){
+            return 'remember';
+        }));
+
+        $this->assertSame('hit_cache',$this->cache()->remember('hit_cache', 1800, function (){
+            return 'remember';
+        }));
     }
 }

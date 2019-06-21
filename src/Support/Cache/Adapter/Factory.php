@@ -10,7 +10,7 @@ namespace EasySmartProgram\Support\Cache\Adapter;
 
 use EasySmartProgram\Support\Exception\InvalidConfigException;
 use EasySmartProgram\Support\Exception\RuntimeException;
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
@@ -57,7 +57,7 @@ class Factory
     /**
      * @param string $name
      * @param array  $config
-     * @return AbstractAdapter|mixed
+     * @return CacheItemPoolInterface : mixed
      * @throws RuntimeException
      */
     public function make(string $name, array $config = [])
