@@ -16,6 +16,6 @@
 
 ## 使用
 
-composer require f-oris/easy-smartprogram:dev-master
+composer require "f-oris/easy-smartprogram:~1.0"
 
 参考[easy-wechat](https://github.com/overtrue/wechat)，因为是仿着做的，所以小程序各组件提供的方法，含义，用法基本上和easy-wechat一致，底层有点不一样，需要深入定制扩展的要看一下源码
