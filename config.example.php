@@ -97,5 +97,10 @@ return [
          * retry delay time, default 500ms
          */
         'retry_delay' => 500,
+
+        /**
+         * set default response type
+         */
+        'response_type' => \EasySmartProgram\Support\Http\ResponseHandler::TYPE_COLLECTION,
     ]
 ];

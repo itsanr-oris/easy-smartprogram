@@ -10,10 +10,11 @@ namespace EasySmartProgram\Tests\Support\Http;
 
 use EasySmartProgram\Support\Http\HttpClient;
 use EasySmartProgram\Support\Http\Middleware\MiddlewareInterface;
-use EasySmartProgram\Support\Http\Response;
+use EasySmartProgram\Support\Http\ResponseHandler;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Mockery;
 use EasySmartProgram\Tests\TestCase;
 
@@ -224,5 +225,30 @@ class HttpClientTest extends TestCase
     {
         $httpClient->removeMiddleware('test-middleware');
         $this->assertEquals(HandlerStack::create(), $httpClient->getHandlerStack());
+    }
+
+    /**
+     * test set response handler
+     */
+    public function testSetResponseHandler()
+    {
+        $httpClient = new HttpClient();
+        $responseHandler = Mockery::mock(ResponseHandler::class);
+        $this->assertSame($responseHandler, $httpClient->setResponseHandler($responseHandler)->getResponseHandler());
+    }
+
+    /**
+     * test set response type
+     */
+    public function testSetResponseType()
+    {
+        $httpClient = new HttpClient();
+
+        $this->assertSame(ResponseHandler::TYPE_GUZZLE_RESPONSE, $httpClient->getResponseType());
+
+        $this->assertSame(
+            ResponseHandler::TYPE_COLLECTION,
+            $httpClient->setResponseType(ResponseHandler::TYPE_COLLECTION)->getResponseType()
+        );
     }
 }

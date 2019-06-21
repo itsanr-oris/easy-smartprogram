@@ -19,7 +19,6 @@ class ServiceProvider extends \EasySmartProgram\Support\Http\ServiceProvider
 
             $this->addLogMiddleware($app, $client);
             $this->addRetryMiddleware($app, $client);
-            $this->addResponseMiddleware($client);
 
             return $client;
         };

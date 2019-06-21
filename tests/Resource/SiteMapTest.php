@@ -9,7 +9,6 @@
 namespace EasySmartProgram\Tests\Resource;
 
 use EasySmartProgram\Resource\SiteMap;
-use EasySmartProgram\Support\Http\Response;
 use EasySmartProgram\Tests\TestCase;
 use GuzzleHttp\Psr7\Request;
 
@@ -34,9 +33,8 @@ class SiteMapTest extends TestCase
 
         $url = 'http://localhost/site-map.json';
         $desc = 'test submit site-map';
-        $response = $this->app()->site_map->submit($url, $desc);
+        $this->app()->site_map->submit($url, $desc);
 
-        $this->assertInstanceOf(Response::class, $response);
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];
@@ -68,9 +66,8 @@ class SiteMapTest extends TestCase
         );
 
         $url = 'http://localhost/site-map.json';
-        $response = $this->app()->site_map->delete($url);
+        $this->app()->site_map->delete($url);
 
-        $this->assertInstanceOf(Response::class, $response);
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];

@@ -8,7 +8,6 @@
 
 namespace EasySmartProgram\Tests\Auth;
 
-use EasySmartProgram\Support\Http\Response;
 use EasySmartProgram\Tests\TestCase;
 use GuzzleHttp\Psr7\Request;
 
@@ -36,8 +35,7 @@ class AuthTest extends TestCase
             '{"openid":"test_openid","session_key":"test_session_key"}'
         );
 
-        $response = $this->app()->auth->session('test_session_code');
-        $this->assertInstanceOf(Response::class, $response);
+        $this->app()->auth->session('test_session_code');
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];

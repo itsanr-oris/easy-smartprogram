@@ -8,7 +8,6 @@
 
 namespace EasySmartProgram\Tests\TemplateMessage;
 
-use EasySmartProgram\Support\Http\Response;
 use EasySmartProgram\Tests\TestCase;
 
 /**
@@ -40,8 +39,8 @@ class ManagerTest extends TestCase
             ])
         );
 
-        $response = $this->app()->template_message->list(0, 2);
-        $this->assertInstanceOf(Response::class, $response);
+        $this->app()->template_message->list(0, 2);
+
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];
@@ -79,8 +78,8 @@ class ManagerTest extends TestCase
             ])
         );
 
-        $response = $this->app()->template_message->get('BD0001');
-        $this->assertInstanceOf(Response::class, $response);
+        $this->app()->template_message->get('BD0001');
+
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];
@@ -116,8 +115,8 @@ class ManagerTest extends TestCase
             ])
         );
 
-        $response = $this->app()->template_message->add('BD0001', [1,2,3]);
-        $this->assertInstanceOf(Response::class, $response);
+        $this->app()->template_message->add('BD0001', [1,2,3]);
+
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];
@@ -152,8 +151,8 @@ class ManagerTest extends TestCase
             ])
         );
 
-        $response = $this->app()->template_message->delete('template_id');
-        $this->assertInstanceOf(Response::class, $response);
+        $this->app()->template_message->delete('template_id');
+
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];
@@ -197,8 +196,8 @@ class ManagerTest extends TestCase
             ])
         );
 
-        $response = $this->app()->template_message->getTemplates(0, 2);
-        $this->assertInstanceOf(Response::class, $response);
+        $this->app()->template_message->getTemplates(0, 2);
+
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];
@@ -243,8 +242,8 @@ class ManagerTest extends TestCase
             ])
         );
 
-        $response = $this->app()->template_message->send($message);
-        $this->assertInstanceOf(Response::class, $response);
+        $this->app()->template_message->send($message);
+
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];

@@ -11,7 +11,6 @@ namespace EasySmartProgram\Support\Http;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
-use Psr\Http\Message\ResponseInterface;
 use EasySmartProgram\Support\Http\Middleware\MiddlewareInterface;
 
 /**
@@ -48,6 +47,16 @@ class HttpClient
     protected $config = [];
 
     /**
+     * @var ResponseHandler
+     */
+    protected $responseHandler;
+
+    /**
+     * @var mixed
+     */
+    protected $responseType = ResponseHandler::TYPE_GUZZLE_RESPONSE;
+
+    /**
      * @var array
      */
     protected static $defaults = [
@@ -58,7 +67,7 @@ class HttpClient
 
     /**
      * HttpClient constructor.
-     * @param array $config
+     * @param array           $config
      */
     public function __construct(array $config = [])
     {
@@ -73,6 +82,45 @@ class HttpClient
     {
         $this->config = $config;
         return $this;
+    }
+
+    /**
+     * @param ResponseHandler $handler
+     * @return $this
+     */
+    public function setResponseHandler(ResponseHandler $handler)
+    {
+        $this->responseHandler = $handler;
+        return $this;
+    }
+
+    /**
+     * @return ResponseHandler
+     */
+    public function getResponseHandler()
+    {
+        if (!$this->responseHandler instanceof ResponseHandler) {
+            $this->responseHandler = new ResponseHandler();
+        }
+        return $this->responseHandler;
+    }
+
+    /**
+     * @param string $type
+     * @return $this
+     */
+    public function setResponseType($type = ResponseHandler::TYPE_COLLECTION)
+    {
+        $this->responseType = $type;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResponseType()
+    {
+        return $this->responseType;
     }
 
     /**
@@ -166,7 +214,7 @@ class HttpClient
      * @param string $url
      * @param array  $query
      * @param array  $options
-     * @return ResponseInterface
+     * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function get(
@@ -181,7 +229,7 @@ class HttpClient
      * @param string $url
      * @param array  $data
      * @param array  $options
-     * @return ResponseInterface
+     * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function post(
@@ -197,7 +245,7 @@ class HttpClient
      * @param array  $data
      * @param array  $query
      * @param array  $options
-     * @return ResponseInterface|string
+     * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function postJson(
@@ -215,7 +263,7 @@ class HttpClient
      * @param array  $form
      * @param array  $query
      * @param array  $options
-     * @return ResponseInterface|string
+     * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function upload(
@@ -247,10 +295,10 @@ class HttpClient
      * @param string $url
      * @param string $method
      * @param array  $options
-     * @return Response
+     * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request(string $url, $method = 'GET', $options = []) : Response
+    public function request(string $url, $method = 'GET', $options = [])
     {
         $method = strtoupper($method);
 
@@ -258,7 +306,7 @@ class HttpClient
 
         $options = $this->fixJsonIssue($options);
 
-        return $this->client()->request($method, $url, $options);
+        return $this->getResponseHandler()->castResponse($this->client()->request($method, $url, $options), $this->getResponseType());
     }
 
     /**

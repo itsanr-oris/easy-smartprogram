@@ -9,10 +9,10 @@
 namespace EasySmartProgram\Tests\Http;
 
 use EasySmartProgram\Http\HttpClient;
-use EasySmartProgram\Support\Http\Response;
 use EasySmartProgram\Tests\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Mockery;
 
 /**

@@ -9,6 +9,7 @@
 namespace EasySmartProgram\Auth;
 
 use EasySmartProgram\Support\Component;
+use EasySmartProgram\Support\Http\ResponseHandler;
 
 /**
  * Class AccessToken
@@ -54,6 +55,7 @@ class AccessToken extends Component
      * @return array|null
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\Cache\InvalidArgumentException
      */
     public function accessTokenRequest($refresh = false)
@@ -63,11 +65,16 @@ class AccessToken extends Component
             return $this->cache()->get($key);
         }
 
-        $response = $this->http()->withoutAccessToken()->request(
+        $client = $this->http();
+        $client->withoutAccessToken();
+        $client->setResponseType(ResponseHandler::TYPE_ARRAY);
+
+        $response = $client->request(
             $this->endpointToGetToken,
             'POST',
             ['base_uri' => '', 'form_params' => $this->getCredentials()]
-        )->toArray();
+        );
+
 
         $this->cache()->set($key, $response);
 
@@ -79,6 +86,7 @@ class AccessToken extends Component
      * @return mixed|null
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getAccessToken($refresh = false)
@@ -91,6 +99,7 @@ class AccessToken extends Component
      * @return array
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getQuery()

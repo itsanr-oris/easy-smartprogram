@@ -9,7 +9,6 @@
 namespace EasySmartProgram\Http;
 
 use EasySmartProgram\Application;
-use EasySmartProgram\Support\Http\Response;
 
 /**
  * Class HttpClient
@@ -61,13 +60,13 @@ class HttpClient extends \EasySmartProgram\Support\Http\HttpClient
      * @param string $url
      * @param string $method
      * @param array  $options
-     * @return Response
+     * @return mixed
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function request(string $url, $method = 'GET', $options = []): Response
+    public function request(string $url, $method = 'GET', $options = [])
     {
         if ($this->withAccessToken && empty($options['query']['access_token'])) {
             $options['query']['access_token'] = $this->app->access_token->getAccessToken();
@@ -77,10 +76,10 @@ class HttpClient extends \EasySmartProgram\Support\Http\HttpClient
     }
 
     /**
-     * @param Response $response
-     * @return Response
+     * @param $response
+     * @return mixed
      */
-    protected function handleResponse(Response $response)
+    protected function handleResponse($response)
     {
         // reset next request with access token
         $this->withAccessToken();

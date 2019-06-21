@@ -9,7 +9,6 @@
 namespace EasySmartProgram\Support\Http;
 
 use EasySmartProgram\Support\Http\Middleware\LogMiddleware;
-use EasySmartProgram\Support\Http\Middleware\ResponseMiddleware;
 use EasySmartProgram\Support\Http\Middleware\RetryMiddleware;
 use EasySmartProgram\Support\Log\Driver\Factory;
 use EasySmartProgram\Support\Log\Logger;
@@ -31,11 +30,10 @@ class ServiceProvider implements ServiceProviderInterface
     public function register(Container $app)
     {
         !isset($app['http_client']) && $app['http_client'] = function ($app) {
-            $client = new HttpClient(array_merge(['app' => $app], $app->config['http']));
+            $client = new HttpClient($app->config['http_client']);
 
             $this->addLogMiddleware($app, $client);
             $this->addRetryMiddleware($app, $client);
-            $this->addResponseMiddleware($client);
 
             return $client;
         };
@@ -59,13 +57,5 @@ class ServiceProvider implements ServiceProviderInterface
     protected function addRetryMiddleware(ServiceContainer $app, HttpClient $client)
     {
         $client->pushMiddleware(new RetryMiddleware($app->config['http_client'] ?? []));
-    }
-
-    /**
-     * @param HttpClient       $client
-     */
-    protected function addResponseMiddleware( HttpClient $client)
-    {
-        $client->pushMiddleware(new ResponseMiddleware());
     }
 }

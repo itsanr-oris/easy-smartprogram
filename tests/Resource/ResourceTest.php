@@ -8,9 +8,9 @@
 
 namespace EasySmartProgram\Tests\Resource;
 
-use EasySmartProgram\Support\Http\Response;
 use EasySmartProgram\Tests\TestCase;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 
 /**
  * Class ResourceTest
@@ -38,9 +38,8 @@ class ResourceTest extends TestCase
             json_encode(['errno' => 0, 'msg' => 'success', 'data' => ''])
         );
 
-        $response = $this->app()->resource->submit([]);
+        $this->app()->resource->submit([]);
 
-        $this->assertInstanceOf(Response::class, $response);
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];
@@ -70,9 +69,8 @@ class ResourceTest extends TestCase
         );
 
         $path = '/pages/index/index';
-        $response = $this->app()->resource->delete($path);
+        $this->app()->resource->delete($path);
 
-        $this->assertInstanceOf(Response::class, $response);
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];

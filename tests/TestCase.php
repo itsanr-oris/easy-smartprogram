@@ -42,6 +42,8 @@ class TestCase extends \EasySmartProgram\Support\Test\TestCase
      *
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function setUp(): void
     {
@@ -97,6 +99,8 @@ class TestCase extends \EasySmartProgram\Support\Test\TestCase
     /**
      * @throws \EasySmartProgram\Support\Exception\InvalidConfigException
      * @throws \EasySmartProgram\Support\Exception\RuntimeException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function setUpAccessToken()
     {
