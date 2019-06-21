@@ -9,6 +9,8 @@
 namespace EasySmartProgram\Tests\Http;
 
 use EasySmartProgram\Http\HttpClient;
+use EasySmartProgram\Support\Exception\InvalidConfigException;
+use EasySmartProgram\Support\Http\ResponseHandler;
 use EasySmartProgram\Tests\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -47,7 +49,7 @@ class HttpClientTest extends TestCase
 
         $httpClient = (new HttpClient($this->app()))->setGuzzleClient($guzzleClient)->setHandlerStack($handlerStack);
 
-        $this->assertSame($response, $httpClient->withAccessToken()->get('/', ['key' => 'value']));
+        $httpClient->withAccessToken()->get('/', ['key' => 'value']);
     }
 
     /**
@@ -73,6 +75,16 @@ class HttpClientTest extends TestCase
 
         $httpClient = (new HttpClient($this->app()))->setGuzzleClient($guzzleClient)->setHandlerStack($handlerStack);
 
-        $this->assertSame($response, $httpClient->withoutAccessToken()->get('/', ['key' => 'value']));
+        $httpClient->withoutAccessToken()->get('/', ['key' => 'value']);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testSetUnsupportResponseTypeConfig()
+    {
+        $this->expectException(InvalidConfigException::class);
+        $this->expectExceptionMessage('Unsupport response type [guzzle]!');
+        (new HttpClient($this->app()))->setConfig(['response_type' => ResponseHandler::TYPE_GUZZLE_RESPONSE]);
     }
 }

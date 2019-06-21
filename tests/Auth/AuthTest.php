@@ -8,6 +8,7 @@
 
 namespace EasySmartProgram\Tests\Auth;
 
+use EasySmartProgram\Support\Collection\Collection;
 use EasySmartProgram\Tests\TestCase;
 use GuzzleHttp\Psr7\Request;
 

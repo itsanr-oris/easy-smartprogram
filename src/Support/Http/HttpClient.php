@@ -54,7 +54,12 @@ class HttpClient
     /**
      * @var mixed
      */
-    protected $responseType = ResponseHandler::TYPE_GUZZLE_RESPONSE;
+    protected $responseType;
+
+    /**
+     * @var string
+     */
+    protected $defaultResponseType = ResponseHandler::TYPE_GUZZLE_RESPONSE;
 
     /**
      * @var array
@@ -72,6 +77,7 @@ class HttpClient
     public function __construct(array $config = [])
     {
         $this->setConfig($config);
+        $this->setResponseType($config['response_type'] ?? $this->defaultResponseType);
     }
 
     /**
@@ -120,7 +126,10 @@ class HttpClient
      */
     public function getResponseType()
     {
-        return $this->responseType;
+        // reset to default response type
+        $type = $this->responseType;
+        $this->setResponseType($this->config['response_type'] ?? $this->defaultResponseType);
+        return $type;
     }
 
     /**

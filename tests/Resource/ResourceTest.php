@@ -38,8 +38,7 @@ class ResourceTest extends TestCase
             json_encode(['errno' => 0, 'msg' => 'success', 'data' => ''])
         );
 
-        $this->app()->resource->submit([]);
-
+        $response = $this->app()->resource->submit([]);
         $this->assertCount(1, $this->historyRequest());
 
         $request = $this->historyRequest()[0]['request'];
