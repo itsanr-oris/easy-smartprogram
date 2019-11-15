@@ -40,4 +40,21 @@ class Auth extends Component
 
         return $this->http()->withoutAccessToken()->post(sprintf('%s?%s', $this->endPoint, http_build_query($params)));
     }
+
+    /**
+     * 获取用户unionid
+     *
+     * @param string $openid
+     * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getUnionid(string $openid)
+    {
+        $params = [
+            'openid' => $openid
+        ];
+
+        $response = $this->http()->post('getunionid', $params);
+        return empty($response['errno']) ? $response['data'] : $response;
+    }
 }
