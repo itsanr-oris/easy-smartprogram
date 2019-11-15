@@ -1,21 +1,64 @@
-## Author
+## EasySmartProgram
 
-    作者：F.oris
-    邮箱：us@f-oris.me
+百度智能小程序SDK，参照[easy-wechat](https://github.com/overtrue/wechat)实现
 
-## 简介
-
-&emsp;&emsp;百度智能小程序SDK，参照easy-wechat实现，主要用与公司项目从微信小程序横向拓展到百度小程序，兼容较底层的平台对接（之前用easy-wechat对接微信平台），降低平台对接与业务代码的耦合以及代码理解维护成本，不定期维护更新
+[![Build Status](https://travis-ci.com/itsanr-oris/easy-smartprogram.svg?branch=master)](https://travis-ci.com/itsanr-oris/easy-smartprogram)
+[![codecov](https://codecov.io/gh/itsanr-oris/easy-smartprogram/branch/master/graph/badge.svg)](https://codecov.io/gh/itsanr-oris/easy-smartprogram)
+[![Latest Stable Version](https://poser.pugx.org/f-oris/easy-smartprogram/v/stable)](https://packagist.org/packages/f-oris/easy-smartprogram)
+[![Latest Unstable Version](https://poser.pugx.org/f-oris/easy-smartprogram/v/unstable)](https://packagist.org/packages/f-oris/easy-smartprogram)
+[![Total Downloads](https://poser.pugx.org/f-oris/easy-smartprogram/downloads)](https://packagist.org/packages/f-oris/easy-smartprogram)
+[![License](https://poser.pugx.org/f-oris/easy-smartprogram/license)](https://packagist.org/packages/f-oris/easy-smartprogram)
 
 ## 功能
 - [x] 小程序登录
 - [x] 小程序授权信息解密
 - [x] 小程序模板消息管理，发送模板消息
 - [x] swan_id校验组件
-- [x] 资源流
+- [ ] 信息流资源
+- [x] 获取unionid
 
-## 使用
+## 安装
 
-composer require f-oris/easy-smartprogram:dev-master
+```bash
+composer require f-oris/easy-smartprogram
+```
 
-参考[easy-wechat](https://github.com/overtrue/wechat)，因为是仿着做的，所以小程序各组件提供的方法，含义，用法基本上和easy-wechat一致，底层有点不一样，需要深入定制扩展的要看一下源码
+## 基本使用
+
+参考[easy-wechat](https://github.com/overtrue/wechat)使用文档，因为是仿着做的，所以小程序各组件提供的方法，含义，用法基本上和easy-wechat一致
+
+## 获取unionid
+
+```php
+// 配置好config，获取code...
+
+$app = new Application($config);
+$session = $app->auth->session($code);
+$uionidData = $app->auth->getUnionid($session['openid']);
+// {"unionid": "St6PVMkgMDeh92Uq2EWfx6H"}
+
+```
+
+## 信息资源流
+
+```
+// 注意：此功能尚未在实际产品上应用验证，慎用
+
+// 配置好config ...
+$app = new Application($config);
+
+// Resource操作，传入参数见官方文档说明
+$app->resource->submit($data);
+$app->resource->delete($path);
+
+// Sitemap操作，传入参数见官方文档说明
+$app->site_map->submit($url, $desc, $type, $frequency);
+$app->site_map->delete($url);
+
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2019-present F.oris <us@f-oris.me>
