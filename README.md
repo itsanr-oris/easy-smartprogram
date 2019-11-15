@@ -1,8 +1,13 @@
 ## EasySmartProgram
 
-百度智能小程序SDK，参照easy-wechat实现
+百度智能小程序SDK，参照[easy-wechat](https://github.com/overtrue/wechat)实现
 
-
+[![Build Status](https://travis-ci.com/itsanr-oris/easy-smartprogram.svg?branch=master)](https://travis-ci.com/itsanr-oris/easy-smartprogram)
+[![codecov](https://codecov.io/gh/itsanr-oris/easy-smartprogram/branch/master/graph/badge.svg)](https://codecov.io/gh/itsanr-oris/easy-smartprogram)
+[![Latest Stable Version](https://poser.pugx.org/f-oris/easy-smartprogram/v/stable)](https://packagist.org/packages/f-oris/easy-smartprogram)
+[![Latest Unstable Version](https://poser.pugx.org/f-oris/easy-smartprogram/v/unstable)](https://packagist.org/packages/f-oris/easy-smartprogram)
+[![Total Downloads](https://poser.pugx.org/f-oris/easy-smartprogram/downloads)](https://packagist.org/packages/f-oris/easy-smartprogram)
+[![License](https://poser.pugx.org/f-oris/easy-smartprogram/license)](https://packagist.org/packages/f-oris/easy-smartprogram)
 
 ## 功能
 - [x] 小程序登录
