@@ -5,9 +5,9 @@ php:
 
 branches:
   except:
-  - develop
+#  - develop
   - master
-#  - /^feature.*$/
+  - /^feature.*$/
 
 install:
 - composer install
